@@ -21,7 +21,7 @@ public class frmMain {
         //фиксированный размер "полей кнопок"
         final Dimension BTS_PANELS_SIZE = new Dimension(120,120);
 
-        frmMain = new JFrame("Менеджер моих списков");
+        frmMain = new JFrame("Менеджер коллекций");
         frmMain.setMinimumSize(new Dimension(640,480));
         frmMain.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frmMain.setLayout(spLA);

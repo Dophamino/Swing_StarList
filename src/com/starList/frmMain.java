@@ -358,6 +358,11 @@ public class frmMain {
                     listRight.setSelectedIndex(indRight);
             }
         });
+        //кнопка "настройки"
+        btnSett.addActionListener(e ->{
+            frmSett frmSett = new frmSett();
+            frmSett.frmShow();
+        });
     }
 
     public void frmShow(){

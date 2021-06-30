@@ -11,6 +11,8 @@ public class frmMain {
         SpringLayout spLA = new SpringLayout();
         //layout для расположения внутри "полей кнопок"
         SpringLayout spLA2 = new SpringLayout();
+
+        //
         // ЧАСТЬ ОПРЕДЕЛЕНИЯ ГРАФИКИ
         //
         //фиксированный размер "полей кнопок"
@@ -190,6 +192,65 @@ public class frmMain {
         listRight.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane spRight = new JScrollPane(listRight);
         pnRight.add(spRight);
+
+        //
+        // ФУНКЦИОНАЛЬНАЯ ЧАСТЬ
+        //
+        //отключаем кнопки заранее
+        btnUp.setEnabled(false);
+        btnDn.setEnabled(false);
+        btnLeft.setEnabled(false);
+        btnRight.setEnabled(false);
+        btnRen.setEnabled(false);
+        btnDel.setEnabled(false);
+
+        //позволяет выбор только в одном из списков одновременно
+        listLeft.addListSelectionListener(e -> {
+            int currInd = listLeft.getSelectedIndex();
+            if ((listRight.getSelectedIndex()>=0)&&(currInd>=0)) {listRight.clearSelection();}
+            btnLeft.setEnabled(false);
+            if (currInd>=0) {
+                btnRight.setEnabled(true);
+                btnDel.setEnabled(true);
+                btnRen.setEnabled(true);
+                btnUp.setEnabled(currInd > 0);
+                btnDn.setEnabled(currInd < (lmLeft.getSize() - 1));
+            } else {
+                    btnRight.setEnabled(false);
+                    btnDel.setEnabled(false);
+                    btnRen.setEnabled(false);
+                    btnUp.setEnabled(false);
+                    btnDn.setEnabled(false);
+                }
+        });
+        listRight.addListSelectionListener(e ->{
+            int currInd = listRight.getSelectedIndex();
+            if ((listLeft.getSelectedIndex()>=0)&&(currInd>=0)) {listLeft.clearSelection();}
+            btnRight.setEnabled(false);
+            if (currInd>=0) {
+                btnLeft.setEnabled(true);
+                btnDel.setEnabled(true);
+                btnRen.setEnabled(true);
+                btnUp.setEnabled(currInd > 0);
+                btnDn.setEnabled(currInd < (lmRight.getSize() - 1));
+            } else {
+                btnLeft.setEnabled(false);
+                btnDel.setEnabled(false);
+                btnRen.setEnabled(false);
+                btnUp.setEnabled(false);
+                btnDn.setEnabled(false);
+            }
+        });
+
+        //функционал кнопок со стрелками
+        btnRight.addActionListener(e ->{
+            if (listLeft.getSelectedIndex()>=0){
+                int index = listLeft.getSelectedIndex();
+                String moveVal = listLeft.getSelectedValue();
+                lmRight.addElement(moveVal);
+                lmLeft.remove(index);
+            }
+        });
     }
 
     public void frmShow(){

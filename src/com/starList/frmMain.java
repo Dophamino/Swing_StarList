@@ -2,6 +2,9 @@ package com.starList;
 
 import  javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 
 public class frmMain {
     JFrame frmMain;
@@ -175,7 +178,7 @@ public class frmMain {
 
         //Графика левого списка
         DefaultListModel<String> lmLeft = new DefaultListModel<>();
-            for (int i=0; i<=50; i++){
+            for (int i=0; i<=15; i++){
                 lmLeft.addElement("element"+i);
             }
         JList<String> listLeft = new JList<>(lmLeft);
@@ -185,7 +188,7 @@ public class frmMain {
 
         //Графика правого списка
         DefaultListModel<String> lmRight = new DefaultListModel<>();
-        for (int i=50; i<=100; i++){
+        for (int i=15; i<=30; i++){
             lmRight.addElement("element"+i);
         }
         JList<String> listRight = new JList<>(lmRight);
@@ -204,7 +207,7 @@ public class frmMain {
         btnRen.setEnabled(false);
         btnDel.setEnabled(false);
 
-        //позволяет выбор только в одном из списков одновременно
+        //позволяет выбор только в одном из списков одновременно, включает кнопки
         listLeft.addListSelectionListener(e -> {
             int currInd = listLeft.getSelectedIndex();
             if ((listRight.getSelectedIndex()>=0)&&(currInd>=0)) {listRight.clearSelection();}
@@ -243,12 +246,116 @@ public class frmMain {
         });
 
         //функционал кнопок со стрелками
+        //кнопка "влево"
+        btnLeft.addActionListener(e ->{
+            if (listRight.getSelectedIndex()>=0){
+                int index = listRight.getSelectedIndex();
+                String moveVal = listRight.getSelectedValue();
+                lmLeft.addElement(moveVal);
+                lmRight.remove(index);
+                listRight.setSelectedIndex(index);
+            }
+        });
+        //кнопка "вправо"
         btnRight.addActionListener(e ->{
             if (listLeft.getSelectedIndex()>=0){
                 int index = listLeft.getSelectedIndex();
                 String moveVal = listLeft.getSelectedValue();
                 lmRight.addElement(moveVal);
                 lmLeft.remove(index);
+                listLeft.setSelectedIndex(index);
+            }
+        });
+        //кнопка "вверх"
+        btnUp.addActionListener(e -> {
+            String currValue;
+            int indLeft = listLeft.getSelectedIndex();
+            int indRight = listRight.getSelectedIndex();
+            if (indLeft>0) {
+                currValue=listLeft.getSelectedValue();
+                lmLeft.remove(indLeft);
+                lmLeft.add(indLeft-1,currValue);
+                listLeft.setSelectedIndex(indLeft-1);
+            } else if (indRight>0) {
+                currValue=listRight.getSelectedValue();
+                lmRight.remove(indRight);
+                lmRight.add(indRight-1,currValue);
+                listRight.setSelectedIndex(indRight-1);
+            }
+        });
+        //кнопка "вниз"
+        btnDn.addActionListener(e -> {
+            String currValue;
+            int indLeft = listLeft.getSelectedIndex();
+            int indRight = listRight.getSelectedIndex();
+            if ((indLeft>=0)&&(indLeft<(lmLeft.getSize()-1))) {
+                currValue=listLeft.getSelectedValue();
+                lmLeft.remove(indLeft);
+                lmLeft.add(indLeft+1,currValue);
+                listLeft.setSelectedIndex(indLeft+1);
+            } else if ((indRight>=0)&&(indRight<(lmRight.getSize()-1))) {
+                currValue=listRight.getSelectedValue();
+                lmRight.remove(indRight);
+                lmRight.add(indRight+1,currValue);
+                listRight.setSelectedIndex(indRight+1);
+            }
+        });
+
+        //функционал кнопок текущего элемента
+        //кнопка "добавить"
+        btnAdd.addActionListener(e ->{
+            String buffText=getClipBoard();
+            if (buffText.length()>50) {buffText="";}
+            String newValue = JOptionPane.showInputDialog(frmMain,"Введи имя нового элемента:",buffText);
+            if ((newValue!=null)&&(!newValue.equals(""))) {
+                if (lmLeft.contains(newValue)) {
+                    JOptionPane.showMessageDialog(frmMain,
+                            "Такой элемент уже есть в ЛЕВОМ списке",
+                            "Не добавлень", JOptionPane.WARNING_MESSAGE);
+                } else if (lmRight.contains(newValue)) {
+                    JOptionPane.showMessageDialog(frmMain,
+                            "Такой элемент уже есть в ПРАВОМ списке",
+                            "Не добавлень", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    lmLeft.addElement(newValue);
+                }
+            }
+        });
+        //кнопка "переименовать"
+        btnRen.addActionListener(e ->{
+            String currValue;
+            String newValue;
+            int indLeft = listLeft.getSelectedIndex();
+            int indRight = listRight.getSelectedIndex();
+            if (indLeft>=0) {
+                currValue=listLeft.getSelectedValue();
+                newValue = JOptionPane.showInputDialog("Введи новое имя:",currValue);
+                if ((newValue!=null)&&(!newValue.equals(""))) {
+                    lmLeft.remove(indLeft);
+                    lmLeft.add(indLeft,newValue);
+                    listLeft.setSelectedIndex(indLeft);
+                }
+
+            } else if (indRight>=0) {
+                currValue=listRight.getSelectedValue();
+                newValue = JOptionPane.showInputDialog("Введи новое имя:",currValue);
+                if ((newValue!=null)&&(!newValue.equals(""))) {
+                    lmRight.remove(indRight);
+                    lmRight.add(indRight,newValue);
+                    listRight.setSelectedIndex(indRight);
+                }
+            }
+        });
+        //кнопка "удалить"
+        btnDel.addActionListener(e ->{
+            int indLeft = listLeft.getSelectedIndex();
+            int indRight = listRight.getSelectedIndex();
+            if (indLeft>=0) {
+                lmLeft.remove(indLeft);
+                listLeft.setSelectedIndex(indLeft);
+            } else if (indRight>=0) {
+                    lmRight.remove(indRight);
+                    listRight.setSelectedIndex(indRight);
             }
         });
     }
@@ -259,5 +366,17 @@ public class frmMain {
         frmMain.setVisible(true);
         frmMain.setLocation((int) (scrSize.getWidth()-frmMain.getWidth())/2,
                 (int) (scrSize.getHeight()-frmMain.getHeight())/2);
+    }
+
+    public String getClipBoard(){
+        try {
+            return (String)Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        } catch (HeadlessException e) {
+            return "";
+        } catch (UnsupportedFlavorException e) {
+            return "";
+        } catch (IOException e) {
+            return "";
+        }
     }
 }

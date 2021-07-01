@@ -386,7 +386,8 @@ public class frmMain {
                     lmLeft.clear();
                     lmRight.clear();
                     while (currLine!=null){
-                        if (currLine.equals("<next_table_contents_who_would_ever_type_that_as_the_line>")) {part2=true;}
+                        currLine=strDecode(currLine);
+                        if (currLine.equals("[table2contents]")) {part2=true;}
                         else{
                             if (!part2){
                                 lmLeft.addElement(currLine);
@@ -400,6 +401,7 @@ public class frmMain {
                     flRead.close();
                 }
             } catch (Exception ex){
+                ex.printStackTrace();
                 JOptionPane.showMessageDialog(frmMain,"Ошибка при чтении файла!",
                         "Ошибка чтения",JOptionPane.ERROR_MESSAGE);
             }
@@ -425,11 +427,11 @@ public class frmMain {
                     FileWriter flWrite = new FileWriter(currFile,false);
                     BufferedWriter buffWrite = new BufferedWriter(flWrite);
                     for (int i=0; i<lmLeft.size(); i++){
-                        buffWrite.write(lmLeft.getElementAt(i)+"\n");
+                        buffWrite.write(strCode(lmLeft.getElementAt(i))+"\n");
                     }
-                    buffWrite.write("<next_table_contents_who_would_ever_type_that_as_the_line>"+"\n");
+                    buffWrite.write(strCode("[table2contents]")+"\n");
                     for (int i=0; i<lmRight.size(); i++){
-                        buffWrite.write(lmRight.getElementAt(i)+"\n");
+                        buffWrite.write(strCode(lmRight.getElementAt(i))+"\n");
                     }
                     buffWrite.close();
                     flWrite.close();
@@ -460,5 +462,23 @@ public class frmMain {
         } catch (IOException e) {
             return "";
         }
+    }
+
+    public String strCode(String str) {
+        final int CODE_KEY = 5;
+        String out_str = "";
+            for (int si = 0; si < str.length(); si++) {
+                out_str += (char) (str.charAt(si) + CODE_KEY);
+            }
+        return  out_str;
+    }
+
+    public String strDecode(String str){
+        final int CODE_KEY=5;
+        String out_str="";
+            for (int si = 0; si < str.length(); si++) {
+                out_str += (char) (str.charAt(si) - CODE_KEY);
+            }
+        return  out_str;
     }
 }

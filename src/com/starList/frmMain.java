@@ -5,10 +5,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class frmMain {
     JFrame frmMain;
@@ -399,9 +396,47 @@ public class frmMain {
                         }
                         currLine = buffRead.readLine();
                     }
+                    buffRead.close();
+                    flRead.close();
                 }
             } catch (Exception ex){
                 JOptionPane.showMessageDialog(frmMain,"Ошибка при чтении файла!",
+                        "Ошибка чтения",JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        //кнока "сохранить"
+        btnSave.addActionListener(e ->{
+            try {
+                File currFile=null;
+                JFileChooser flOpen = new JFileChooser();
+                FileNameExtensionFilter flChoose =
+                        new FileNameExtensionFilter("Списки коллекций (.dpa)","dpa");
+                flOpen.setFileFilter(flChoose);
+                flOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                flOpen.setMultiSelectionEnabled(false);
+                flOpen.setAcceptAllFileFilterUsed(false);
+                if ((flOpen.showSaveDialog(flOpen))==JFileChooser.APPROVE_OPTION){
+                    currFile =flOpen.getSelectedFile();
+                    if (!currFile.getName().contains(".dpa")){
+                        currFile=new File(currFile.getAbsolutePath()+".dpa");
+                    }
+                }
+                if (currFile!=null) {
+                    FileWriter flWrite = new FileWriter(currFile,false);
+                    BufferedWriter buffWrite = new BufferedWriter(flWrite);
+                    for (int i=0; i<lmLeft.size(); i++){
+                        buffWrite.write(lmLeft.getElementAt(i)+"\n");
+                    }
+                    buffWrite.write("<next_table_contents_who_would_ever_type_that_as_the_line>"+"\n");
+                    for (int i=0; i<lmRight.size(); i++){
+                        buffWrite.write(lmRight.getElementAt(i)+"\n");
+                    }
+                    buffWrite.close();
+                    flWrite.close();
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frmMain,"Ошибка при записи файла!",
                         "Ошибка чтения",JOptionPane.ERROR_MESSAGE);
             }
         });

@@ -1,9 +1,13 @@
 package com.starList;
 
 import  javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 public class frmMain {
@@ -362,6 +366,44 @@ public class frmMain {
         btnSett.addActionListener(e ->{
             frmSett frmSett = new frmSett();
             frmSett.frmShow();
+        });
+        //кнока "загрузить"
+        btnLoad.addActionListener(e ->{
+            try {
+                File currFile=null;
+                JFileChooser flOpen = new JFileChooser();
+                FileNameExtensionFilter flChoose =
+                        new FileNameExtensionFilter("Списки коллекций (.dpa)","dpa");
+                flOpen.setFileFilter(flChoose);
+                flOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                flOpen.setMultiSelectionEnabled(false);
+                flOpen.setAcceptAllFileFilterUsed(false);
+                if ((flOpen.showOpenDialog(flOpen))==JFileChooser.APPROVE_OPTION){
+                    currFile =flOpen.getSelectedFile();
+                }
+                if (currFile!=null) {
+                    boolean part2 = false;
+                    FileReader flRead = new FileReader(currFile);
+                    BufferedReader buffRead = new BufferedReader(flRead);
+                    String currLine = buffRead.readLine();
+                    lmLeft.clear();
+                    lmRight.clear();
+                    while (currLine!=null){
+                        if (currLine.equals("<next_table_contents_who_would_ever_type_that_as_the_line>")) {part2=true;}
+                        else{
+                            if (!part2){
+                                lmLeft.addElement(currLine);
+                            } else {
+                                lmRight.addElement(currLine);
+                            }
+                        }
+                        currLine = buffRead.readLine();
+                    }
+                }
+            } catch (Exception ex){
+                JOptionPane.showMessageDialog(frmMain,"Ошибка при чтении файла!",
+                        "Ошибка чтения",JOptionPane.ERROR_MESSAGE);
+            }
         });
     }
 
